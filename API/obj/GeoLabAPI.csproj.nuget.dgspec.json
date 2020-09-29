@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\______M.R.Zargar\\GeoLab\\API\\API\\GeoLabAPI.csproj": {}
+    "D:\\______M.R.Zargar\\_GeoLab\\API\\API\\GeoLabAPI.csproj": {}
   },
   "projects": {
-    "D:\\______M.R.Zargar\\GeoLab\\API\\API\\GeoLabAPI.csproj": {
+    "D:\\______M.R.Zargar\\_GeoLab\\API\\API\\GeoLabAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\______M.R.Zargar\\GeoLab\\API\\API\\GeoLabAPI.csproj",
+        "projectUniqueName": "D:\\______M.R.Zargar\\_GeoLab\\API\\API\\GeoLabAPI.csproj",
         "projectName": "GeoLabAPI",
-        "projectPath": "D:\\______M.R.Zargar\\GeoLab\\API\\API\\GeoLabAPI.csproj",
+        "projectPath": "D:\\______M.R.Zargar\\_GeoLab\\API\\API\\GeoLabAPI.csproj",
         "packagesPath": "C:\\Users\\zarga\\.nuget\\packages\\",
-        "outputPath": "D:\\______M.R.Zargar\\GeoLab\\API\\API\\obj\\",
+        "outputPath": "D:\\______M.R.Zargar\\_GeoLab\\API\\API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\zarga\\AppData\\Roaming\\NuGet\\NuGet.Config"

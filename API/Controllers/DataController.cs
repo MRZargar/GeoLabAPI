@@ -12,6 +12,9 @@ namespace GeoLabAPI.Controllers
     [ApiController]
     public class DataController : ControllerBase
     {
+        const int oneHourAsSeconds = 1 * 60 * 60;
+        const int dataCountPerHour = oneHourAsSeconds * 100;
+        const int oneWeekAsSeconds = 7 * 24 * oneHourAsSeconds;
         private IStationDataRepository datas;
         private IStationsSetupRepository stations;
 
@@ -21,25 +24,35 @@ namespace GeoLabAPI.Controllers
             stations = new StationsSetupRepository(context);
         }
 
+        private void nextHour(ref int week, ref double t)
+        {
+            t += oneHourAsSeconds;
+            if (t >= oneWeekAsSeconds)
+            {
+                t -= oneWeekAsSeconds;
+                week++;
+            }
+        }
+
         [HttpGet("Histogram/{tableName}")]
-        public async Task<ActionResult<IEnumerable<double>>> GetDatas(string tableName, int? week, double? t)
+        public async Task<ActionResult<IEnumerable<double>>> GetCount(string tableName, int? week, double? t)
         {
             if (week == null || t == null)
                 return NotFound();
-            
-            int oneHourAsSeconds = 1 * 60 * 60;
-            int dataCountPerHour = oneHourAsSeconds * 100;
 
             try
             {
+                int currentWeek = week.Value;
+                double currentT = t.Value;
                 var HistData = new List<double>();
-                for (int i = 0; i < 24; i++)
+                for (int i = 1; i <= 24; i++)
                 {
-                    var from = new GPSTime(i * week.Value, t.Value + (i - 1) * oneHourAsSeconds);
-                    var to = new GPSTime((i + 1) * week.Value, t.Value + i * oneHourAsSeconds);
+                    var from = new GPSTime(currentWeek, currentT);
+                    nextHour(ref currentWeek, ref currentT);
+                    var to = new GPSTime(currentWeek, currentT - 0.001);
 
-                    int count = datas.GetCount(tableName, from, to);
-                    double percent = count / dataCountPerHour;
+                    var count = datas.GetCount(tableName, from, to);
+                    double percent = (double)count / (double)dataCountPerHour * 100.0;
 
                     HistData.Add(percent);
                 }
@@ -56,10 +69,9 @@ namespace GeoLabAPI.Controllers
             }
         }
 
-
         // GET: api/Data
         [HttpGet("{tableName}")]
-        public async Task<ActionResult<IEnumerable<StationData>>> GetDatas(string tableName, int? fromWeek, int? toWeek, double? fromT, double? toT)
+        public async Task<ActionResult<IEnumerable<IEnumerable<double>>>> GetDatas(string tableName, int? fromWeek, int? toWeek, double? fromT, double? toT)
         {
             try
             {
@@ -69,7 +81,13 @@ namespace GeoLabAPI.Controllers
                 if (toWeek != null || toT != null)
                     to = new GPSTime(toWeek.Value, toT.Value);
 
-                return (await datas.GetAllAsync(tableName, from, to)).ToList();
+                var Datas = (await datas.GetAllAsync(tableName, from, to)).ToList();
+                var All = new List<List<double>>();
+                foreach (var data in Datas)
+                {
+                    All.Add(new List<double>() {data.WEEK, data.T, data.AX, data.AY, data.AZ, data.Temp.Value} );
+                }
+                return All;
             }
             catch (NotFoundException)
             {
@@ -83,11 +101,12 @@ namespace GeoLabAPI.Controllers
 
         // GET: api/Data/5
         [HttpGet("{tableName}/{week}/{id}")]
-        public async Task<ActionResult<StationData>> GetStationData(string tableName, int week, double id)
+        public async Task<ActionResult<IEnumerable<double>>> GetStationData(string tableName, int week, double id)
         {
             try
             {
-                return await datas.GetByIdAsync(tableName, week, id);
+                var data = await datas.GetByIdAsync(tableName, week, id);
+                return new List<double>() {data.WEEK, data.T, data.AX, data.AY, data.AZ, data.Temp.Value};
             }
             catch (NotFoundException)
             {
@@ -128,20 +147,30 @@ namespace GeoLabAPI.Controllers
                 return StatusCode(501);
             }
 
-            return RedirectToAction("GetStationData", new { tableName = tableName, id = id });
+            return RedirectToAction("GetStationData", new { tableName = tableName, id = id, week = week });
         }
 
         // POST: api/Data
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("{tableName}")]
-        public async Task<ActionResult<StationData>> PostStationData(string tableName, StationData[] data)
+        public async Task<ActionResult<StationData>> PostStationData(string tableName, double[][] data)
         {
             foreach (var item in data)
             {
                 try
                 {
-                    datas.InsertAsync(tableName, item);
+                    var newData = new StationData() 
+                    {
+                        WEEK = (int)item[0],
+                        T = item[1],
+                        AX = item[2],
+                        AY = item[3],
+                        AZ = item[4],
+                        Temp = item[5]
+                    };
+
+                    datas.InsertAsync(tableName, newData);
                 }
                 catch(DuplicateException)
                 {
@@ -219,7 +248,6 @@ namespace GeoLabAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Data/{RaspberryID}/313
         [HttpGet("{RaspberryID}/313")]
         public ActionResult<string> GetRaspberry(int RaspberryID)
         {
@@ -237,13 +265,14 @@ namespace GeoLabAPI.Controllers
             }
         }
 
+
         [HttpPut("{tableName}")]
-        public async Task<IActionResult> PutStatus(string tableName, int healthCode)
+        public async Task<IActionResult> PutStatus(string tableName, RaspberryHealth h)
         {
             try
             {
                 var station = stations.GetByTableNameAsync(tableName);
-                station.Health = healthCode;
+                station.Health = h.healthCode;
                 station.HealthTime = DateTime.Now;
 
                 await stations.UpdateAsync(station);

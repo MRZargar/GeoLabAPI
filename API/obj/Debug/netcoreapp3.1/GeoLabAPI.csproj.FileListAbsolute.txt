@@ -258,3 +258,11 @@
 /media/zargar/MyStore/__________M.R.Zargar/GeoLab/API/API/obj/Debug/netcoreapp3.1/GeoLabAPI.csproj.CopyComplete
 /media/zargar/MyStore/__________M.R.Zargar/GeoLab/API/API/obj/Debug/netcoreapp3.1/GeoLabAPI.dll
 /media/zargar/MyStore/__________M.R.Zargar/GeoLab/API/API/obj/Debug/netcoreapp3.1/GeoLabAPI.pdb
+D:\______M.R.Zargar\_GeoLab\API\API\bin\Debug\netcoreapp3.1\GeoLabAPI.dll
+D:\______M.R.Zargar\_GeoLab\API\API\bin\Debug\netcoreapp3.1\Microsoft.Bcl.AsyncInterfaces.dll
+D:\______M.R.Zargar\_GeoLab\API\API\bin\Debug\netcoreapp3.1\Microsoft.Bcl.HashCode.dll
+D:\______M.R.Zargar\_GeoLab\API\API\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.dll
+D:\______M.R.Zargar\_GeoLab\API\API\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\______M.R.Zargar\_GeoLab\API\API\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Relational.dll
+D:\______M.R.Zargar\_GeoLab\API\API\bin\Debug\netcoreapp3.1\Npgsql.dll
+D:\______M.R.Zargar\_GeoLab\API\API\bin\Debug\netcoreapp3.1\Npgsql.EntityFrameworkCore.PostgreSQL.dll

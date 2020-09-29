@@ -25,6 +25,11 @@ namespace GeoLabAPI
         }
     }
 
+    public class RaspberryHealth
+    {
+        public int healthCode { get; set; }
+    }
+
     public class StationsSetupRepository : IStationsSetupRepository
     {
         private geolabContext db;
@@ -118,13 +123,16 @@ namespace GeoLabAPI
             if (station.Longitude == NULL_decimal)
                 throw new NotFoundException();
 
-            if (station.StationName == string.Empty)
-                throw new NotFoundException();
-
             if (station.Address == null)
-                throw new NotFoundException();               
+                throw new NotFoundException();        
 
             if (station.Date == NULL_dateTime)
+                throw new NotFoundException();
+
+            if (station.StationId == null)
+                throw new NotFoundException();
+
+            if (station.Owner == null)
                 throw new NotFoundException();
 
             station.Id = 0;
@@ -173,15 +181,16 @@ namespace GeoLabAPI
 
             s.OperatorId = station.OperatorId == NULL_int ? s.OperatorId : station.OperatorId;
             s.SensorType = station.SensorType ?? s.SensorType;
-            // s.Status = station.Status;
-            s.Health = station.Health == NULL_int ? s.Health : station.Health;
+            s.Status = station.Status ?? s.Status;
+            s.Health = station.Health ?? s.Health;
             s.Latitude = station.Latitude == NULL_decimal ? s.Latitude : station.Latitude;
             s.Longitude = station.Longitude == NULL_decimal ? s.Longitude : station.Longitude;
             s.Date = station.Date == NULL_dateTime ? s.Date : station.Date;
             s.HealthTime = station.HealthTime ?? s.HealthTime;
             s.Address = station.Address ?? s.Address;
-            s.Description = station.Description ?? s.Description;
-            s.StationName = station.StationName ?? s.StationName;
+            s.City = station.City ?? s.City;
+            s.Owner = station.Owner ?? s.Owner;
+            s.StationId = station.StationId ?? s.StationId;
             
             return true;
         }

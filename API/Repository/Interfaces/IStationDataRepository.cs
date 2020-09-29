@@ -6,8 +6,8 @@ namespace GeoLabAPI
 {
     public interface IStationDataRepository
     {
-        int GetCount(string tableName, GPSTime from = null, GPSTime to = null);
-        Task<IEnumerable<StationData>> GetAllAsync(string tableName, GPSTime from = null, GPSTime to = null);
+        int GetCount(string tableName, GPSTime from, GPSTime to);
+        Task<IEnumerable<StationData>> GetAllAsync(string tableName, GPSTime from, GPSTime to);
         Task<StationData> GetByIdAsync(string tableName, int week, double T);
         Task<bool> InsertAsync(string tableName, StationData data);
         Task<bool> UpdateAsync(string tableName, StationData data);

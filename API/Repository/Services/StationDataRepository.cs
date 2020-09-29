@@ -65,20 +65,41 @@ namespace GeoLabAPI
             db.tableName = tableName.ToLower();
 
             if (!IsExistStation(tableName))
-                throw new NotFoundException();
+                throw new NotFoundException();    
+
+            if (from == null)
+            {
+                if (to == null)
+                {
+                    return await db.Datas.ToListAsync();
+                }
+
+                return await db.Datas
+                    .Where(x =>
+                        x.WEEK <= to.week
+                        && x.T <= to.t)
+                    .ToListAsync();
+            }
+
+            if (to == null)
+            {
+                return await db.Datas
+                    .Where(x =>
+                        x.WEEK >= from.week 
+                        && x.T >= from.t)
+                    .ToListAsync();
+            }
 
             return await db.Datas
                 .Where(x =>
-                    from == null ? true :
-                        (x.WEEK >= from.week 
-                        && x.T >= from.t)
-                    && to == null ? true :
-                        (x.WEEK <= to.week
-                        && x.T <= to.t))
-                .ToListAsync();
+                    x.WEEK >= from.week 
+                    && x.T >= from.t
+                    && x.WEEK <= to.week
+                    && x.T <= to.t)
+                .ToListAsync();        
         }
 
-        public int GetCount(string tableName, GPSTime from = null, GPSTime to = null)
+        public int GetCount(string tableName, GPSTime from, GPSTime to)
         {
             db.tableName = tableName.ToLower();
 
@@ -87,12 +108,10 @@ namespace GeoLabAPI
 
             return db.Datas
                 .Where(x =>
-                    from == null ? true :
-                        (x.WEEK >= from.week 
-                        && x.T >= from.t)
-                    && to == null ? true :
-                        (x.WEEK <= to.week
-                        && x.T <= to.t))
+                    x.WEEK >= from.week 
+                    && x.T >= from.t
+                    && x.WEEK <= to.week
+                    && x.T <= to.t)
                 .Count();
         }
 

@@ -22,7 +22,7 @@ namespace GeoLabAPI
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Raspberry>(entity =>
+             modelBuilder.Entity<Raspberry>(entity =>
             {
                 entity.ToTable("stations_raspberry");
 
@@ -63,24 +63,26 @@ namespace GeoLabAPI
                 entity.ToTable("stations_setup");
 
                 entity.HasIndex(e => e.OperatorId)
-                    .HasName("stations_setup_operator_id_id_9412c219");
+                    .HasName("stations_setup_operator_id_6e1c4ca0");
 
-                entity.HasIndex(e => e.StationName)
-                    .HasName("stations_setup_station_name_74fc2797_like")
+                entity.HasIndex(e => e.StationId)
+                    .HasName("stations_setup_station_id_aaffad0a_like")
                     .HasOperators(new[] { "varchar_pattern_ops" });
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Address)
-                    .IsRequired()
                     .HasColumnName("address")
                     .HasMaxLength(300);
+
+                entity.Property(e => e.City)
+                    .IsRequired()
+                    .HasColumnName("city")
+                    .HasMaxLength(150);
 
                 entity.Property(e => e.Date)
                     .HasColumnName("date")
                     .HasColumnType("timestamp with time zone");
-
-                entity.Property(e => e.Description).HasColumnName("description");
 
                 entity.Property(e => e.Health).HasColumnName("health");
 
@@ -98,6 +100,11 @@ namespace GeoLabAPI
 
                 entity.Property(e => e.OperatorId).HasColumnName("operator_id");
 
+                entity.Property(e => e.Owner)
+                    .IsRequired()
+                    .HasColumnName("owner")
+                    .HasMaxLength(200);
+
                 entity.Property(e => e.RaspberryId).HasColumnName("raspberryID");
 
                 entity.Property(e => e.SensorType)
@@ -105,10 +112,10 @@ namespace GeoLabAPI
                     .HasColumnName("sensor_type")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.StationName)
+                entity.Property(e => e.StationId)
                     .IsRequired()
-                    .HasColumnName("station_name")
-                    .HasMaxLength(150);
+                    .HasColumnName("station_id")
+                    .HasMaxLength(8);
 
                 entity.Property(e => e.Status).HasColumnName("status");
 

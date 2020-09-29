@@ -1,6 +1,7 @@
 {
   "version": 2,
 <<<<<<< HEAD
+<<<<<<< HEAD
   "dgSpecHash": "BZ6mW9lgfIV/AhupNFnb2le25nznJs5yI/MvkSGhOZ/ufx+xrv8azMao1MtwCGHPLtT/LnvDJnMKVFCk5rXGSw==",
   "success": true,
   "projectFilePath": "/app/API/GeoLabAPI.csproj",
@@ -163,8 +164,11 @@
     "/root/.nuget/packages/system.xml.xmlserializer/4.3.0/system.xml.xmlserializer.4.3.0.nupkg.sha512"
 =======
   "dgSpecHash": "Y/lfTkZeR/cSMVV0RG4i4HF41LNVPv+ouiKvQPMdCMJ5+E8/xAzbKcNb6ECM8sxxtr9336xpLAgRenLwZtFr0Q==",
+=======
+  "dgSpecHash": "uGGmwgNeVjcwY706ng7xmFoywHS0VOkmaBOc29Uh5svtPuLGS7JDZxMzUwLYZ9T2f6f301GcUjEo8jZCvmvlKA==",
+>>>>>>> 68dad9e... Histogram + get from to + fixed bug from healthCode
   "success": true,
-  "projectFilePath": "D:\\______M.R.Zargar\\GeoLab\\API\\API\\GeoLabAPI.csproj",
+  "projectFilePath": "D:\\______M.R.Zargar\\_GeoLab\\API\\API\\GeoLabAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\zarga\\.nuget\\packages\\microsoft.aspnetcore.html.abstractions\\2.2.0\\microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",
     "C:\\Users\\zarga\\.nuget\\packages\\microsoft.aspnetcore.razor\\2.2.0\\microsoft.aspnetcore.razor.2.2.0.nupkg.sha512",
