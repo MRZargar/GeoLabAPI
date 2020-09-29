@@ -37,13 +37,15 @@ namespace GeoLabAPI
 
             modelBuilder.Entity<StationData>(entity =>
             {
-                entity.HasKey(e => e.T)
+                entity.HasKey(e => new { e.WEEK, e.T })
                     .HasName(tableName + "_pkey");
 
                 entity.ToTable(tableName);
 
                 entity.HasIndex(e => e.T)
                     .HasName("index_" + tableName);
+
+                entity.Property(e => e.WEEK).HasColumnName("week");
 
                 entity.Property(e => e.T).HasColumnName("t");
 
@@ -81,6 +83,10 @@ namespace GeoLabAPI
                 entity.Property(e => e.Description).HasColumnName("description");
 
                 entity.Property(e => e.Health).HasColumnName("health");
+
+                entity.Property(e => e.HealthTime)
+                    .HasColumnName("health_time")
+                    .HasColumnType("timestamp with time zone");
 
                 entity.Property(e => e.Latitude)
                     .HasColumnName("latitude")

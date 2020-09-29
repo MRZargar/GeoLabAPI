@@ -6,14 +6,15 @@ namespace GeoLabAPI
 {
     public interface IStationDataRepository
     {
-        Task<IEnumerable<StationData>> GetAllAsync(string tableName);
-        Task<StationData> GetByIdAsync(string tableName, double T);
+        int GetCount(string tableName, GPSTime from = null, GPSTime to = null);
+        Task<IEnumerable<StationData>> GetAllAsync(string tableName, GPSTime from = null, GPSTime to = null);
+        Task<StationData> GetByIdAsync(string tableName, int week, double T);
         Task<bool> InsertAsync(string tableName, StationData data);
         Task<bool> UpdateAsync(string tableName, StationData data);
         bool Delete(string tableName, StationData data);
-        Task<bool> DeleteAsync(string tableName, double T);
+        Task<bool> DeleteAsync(string tableName, int week, double T);
         bool IsExist(string tableName, StationData data);
-        bool IsExist(string tableName, double T);
+        bool IsExist(string tableName, int week, double T);
         string GetTableNameByStationId(int id);
         string GetTableNameByRaspberryId(int id);
         

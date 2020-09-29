@@ -18,5 +18,6 @@ namespace GeoLabAPI
         public decimal Longitude { get; set; }
         public int Health { get; set; }
         public int RaspberryId { get; set; }
+        public DateTime? HealthTime { get; set; }
     }
 }

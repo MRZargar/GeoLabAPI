@@ -9,6 +9,22 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GeoLabAPI
 {
+    public class GPSTime
+    {
+        public int week { get; }
+        public double t { get; }
+
+        public GPSTime(int week, double t)
+        {
+            this.week = week;
+            this.t = t;
+        }
+        
+        public GPSTime()
+        {
+        }
+    }
+
     public class StationsSetupRepository : IStationsSetupRepository
     {
         private geolabContext db;
@@ -36,7 +52,7 @@ namespace GeoLabAPI
             var table = await datas.GetAllAsync(tableName.ToLower());
             foreach (var data in table)
             {
-                datas.DeleteAsync(tableName, data.T);
+                datas.DeleteAsync(tableName, data.WEEK, data.T);
             }
         }
 
@@ -135,8 +151,8 @@ namespace GeoLabAPI
         {
             return db.Stations.Any(s => 
                 s.SensorType == sensorType 
-                && s.Latitude.CompareTo(lat) == 0 ? true : false
-                && s.Longitude.CompareTo(lon) == 0 ? true : false);
+                && s.Latitude.CompareTo(lat) == 0
+                && s.Longitude.CompareTo(lon) == 0);
         }
 
         public bool IsExist(string tableName)
@@ -158,9 +174,11 @@ namespace GeoLabAPI
             s.OperatorId = station.OperatorId == NULL_int ? s.OperatorId : station.OperatorId;
             s.SensorType = station.SensorType ?? s.SensorType;
             // s.Status = station.Status;
+            s.Health = station.Health == NULL_int ? s.Health : station.Health;
             s.Latitude = station.Latitude == NULL_decimal ? s.Latitude : station.Latitude;
             s.Longitude = station.Longitude == NULL_decimal ? s.Longitude : station.Longitude;
             s.Date = station.Date == NULL_dateTime ? s.Date : station.Date;
+            s.HealthTime = station.HealthTime ?? s.HealthTime;
             s.Address = station.Address ?? s.Address;
             s.Description = station.Description ?? s.Description;
             s.StationName = station.StationName ?? s.StationName;

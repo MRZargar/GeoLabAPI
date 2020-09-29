@@ -14,6 +14,7 @@ namespace GeoLabAPI
         private geolabContext db;
         private bool disposed = false;
         const double double_NULL = default(double);
+        const int int_NULL = default(int);
         public StationDataRepository(geolabContext context) => db = context;
 
         public bool IsExistStation(string tableName)
@@ -31,14 +32,14 @@ namespace GeoLabAPI
             return true;
         }
 
-        public async Task<bool> DeleteAsync(string tableName, double T)
+        public async Task<bool> DeleteAsync(string tableName, int week, double T)
         {
             db.tableName = tableName.ToLower();
 
             if (!IsExistStation(tableName))
                 throw new NotFoundException();
 
-            var data = await GetByIdAsync(tableName, T);
+            var data = await GetByIdAsync(tableName, week, T);
             return Delete(tableName, data);
         } 
 
@@ -59,32 +60,61 @@ namespace GeoLabAPI
             GC.SuppressFinalize(this);
         }
 
-        public async Task<IEnumerable<StationData>> GetAllAsync(string tableName)
+        public async Task<IEnumerable<StationData>> GetAllAsync(string tableName, GPSTime from = null, GPSTime to = null)
         {
             db.tableName = tableName.ToLower();
 
             if (!IsExistStation(tableName))
                 throw new NotFoundException();
 
-            return await db.Datas.ToListAsync();
+            return await db.Datas
+                .Where(x =>
+                    from == null ? true :
+                        (x.WEEK >= from.week 
+                        && x.T >= from.t)
+                    && to == null ? true :
+                        (x.WEEK <= to.week
+                        && x.T <= to.t))
+                .ToListAsync();
         }
 
-        public async Task<StationData> GetByIdAsync(string tableName, double T)
+        public int GetCount(string tableName, GPSTime from = null, GPSTime to = null)
+        {
+            db.tableName = tableName.ToLower();
+
+            if (!IsExistStation(tableName))
+                throw new NotFoundException();
+
+            return db.Datas
+                .Where(x =>
+                    from == null ? true :
+                        (x.WEEK >= from.week 
+                        && x.T >= from.t)
+                    && to == null ? true :
+                        (x.WEEK <= to.week
+                        && x.T <= to.t))
+                .Count();
+        }
+
+        public async Task<StationData> GetByIdAsync(string tableName, int week, double T)
         {
             db.tableName = tableName.ToLower();
 
             if (!IsExistStation(tableName))
                 throw new NotFoundException();         
             
-            if (!IsExist(tableName, T))
+            if (!IsExist(tableName, week, T))
                 throw new NotFoundException();
 
             return await db.Datas
-                .FirstAsync(m => m.T == T);
+                .FirstAsync(m => m.T == T && m.WEEK == week);
         }
 
         public async Task<bool> InsertAsync(string tableName, StationData data)
-        {     
+        {  
+            if (data.WEEK == int_NULL)
+                throw new NotFoundException();
+
             if (data.T == double_NULL)
                 throw new NotFoundException();
 
@@ -106,17 +136,17 @@ namespace GeoLabAPI
 
         public bool IsExist(string tableName, StationData data)
         {
-            return IsExist(tableName, data.T);
+            return IsExist(tableName, data.WEEK, data.T);
         }
 
-        public bool IsExist(string tableName, double T)
+        public bool IsExist(string tableName, int week, double T)
         {
             db.tableName = tableName.ToLower();
 
             if (!IsExistStation(tableName))
                 throw new NotFoundException();
             
-            return db.Datas.Any(x => x.T == T);
+            return db.Datas.Any(x => x.T == T && x.WEEK == week);
         }
 
         public async Task<bool> saveAsync()
@@ -127,7 +157,7 @@ namespace GeoLabAPI
 
         public async Task<bool> UpdateAsync(string tableName, StationData data)
         {
-            StationData d = await GetByIdAsync(tableName, data.T);
+            StationData d = await GetByIdAsync(tableName, data.WEEK, data.T);
 
             d.AX = data.AX == double_NULL ? d.AX : data.AX;
             d.AY = data.AY == double_NULL ? d.AY : data.AY;

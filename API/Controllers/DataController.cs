@@ -21,13 +21,55 @@ namespace GeoLabAPI.Controllers
             stations = new StationsSetupRepository(context);
         }
 
+        [HttpGet("Histogram/{tableName}")]
+        public async Task<ActionResult<IEnumerable<double>>> GetDatas(string tableName, int? week, double? t)
+        {
+            if (week == null || t == null)
+                return NotFound();
+            
+            int oneHourAsSeconds = 1 * 60 * 60;
+            int dataCountPerHour = oneHourAsSeconds * 100;
+
+            try
+            {
+                var HistData = new List<double>();
+                for (int i = 0; i < 24; i++)
+                {
+                    var from = new GPSTime(i * week.Value, t.Value + (i - 1) * oneHourAsSeconds);
+                    var to = new GPSTime((i + 1) * week.Value, t.Value + i * oneHourAsSeconds);
+
+                    int count = datas.GetCount(tableName, from, to);
+                    double percent = count / dataCountPerHour;
+
+                    HistData.Add(percent);
+                }
+
+                return HistData;
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(501);
+            }
+        }
+
+
         // GET: api/Data
         [HttpGet("{tableName}")]
-        public async Task<ActionResult<IEnumerable<StationData>>> GetDatas(string tableName)
+        public async Task<ActionResult<IEnumerable<StationData>>> GetDatas(string tableName, int? fromWeek, int? toWeek, double? fromT, double? toT)
         {
             try
             {
-                return (await datas.GetAllAsync(tableName)).ToList();
+                GPSTime from = null, to = null;
+                if (fromWeek != null || fromT != null)
+                    from = new GPSTime(fromWeek.Value, fromT.Value);
+                if (toWeek != null || toT != null)
+                    to = new GPSTime(toWeek.Value, toT.Value);
+
+                return (await datas.GetAllAsync(tableName, from, to)).ToList();
             }
             catch (NotFoundException)
             {
@@ -40,12 +82,12 @@ namespace GeoLabAPI.Controllers
         }
 
         // GET: api/Data/5
-        [HttpGet("{tableName}/{id}")]
-        public async Task<ActionResult<StationData>> GetStationData(string tableName, double id)
+        [HttpGet("{tableName}/{week}/{id}")]
+        public async Task<ActionResult<StationData>> GetStationData(string tableName, int week, double id)
         {
             try
             {
-                return await datas.GetByIdAsync(tableName, id);
+                return await datas.GetByIdAsync(tableName, week, id);
             }
             catch (NotFoundException)
             {
@@ -60,10 +102,10 @@ namespace GeoLabAPI.Controllers
         // PUT: api/Data/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{tableName}/{id}")]
-        public async Task<IActionResult> PutStationData(string tableName, double id, StationData data)
+        [HttpPut("{tableName}/{week}/{id}")]
+        public async Task<IActionResult> PutStationData(string tableName, int week, double id, StationData data)
         {
-            if (id != data.T)
+            if (id != data.T && week != data.WEEK)
             {
                 return BadRequest();
             }
@@ -128,12 +170,12 @@ namespace GeoLabAPI.Controllers
         }
 
         // DELETE: api/Data/5
-        [HttpDelete("{tableName}/{id}")]
-        public async Task<ActionResult<StationData>> DeleteStationData(string tableName, double id)
+        [HttpDelete("{tableName}/{week}/{id}")]
+        public async Task<ActionResult<StationData>> DeleteStationData(string tableName, int week, double id)
         {
             try
             {
-                await datas.DeleteAsync(tableName, id);
+                await datas.DeleteAsync(tableName, week, id);
                 await datas.saveAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -202,6 +244,7 @@ namespace GeoLabAPI.Controllers
             {
                 var station = stations.GetByTableNameAsync(tableName);
                 station.Health = healthCode;
+                station.HealthTime = DateTime.Now;
 
                 await stations.UpdateAsync(station);
                 await stations.saveAsync();
@@ -220,6 +263,6 @@ namespace GeoLabAPI.Controllers
             }
 
             return NoContent();
-        }
+        }       
     }
 }
